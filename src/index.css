@@ -1,0 +1,348 @@
+/* =========================
+   WatchPlan - Global Styles
+   ========================= */
+
+:root {
+  font-family:
+    Inter, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+
+  color: #171717;
+  background: #ffffff;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: #ffffff;
+  color: #171717;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+/* =========================
+   Layout
+   ========================= */
+
+.container {
+  width: min(1200px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 48px 0 80px;
+}
+
+/* =========================
+   Header
+   ========================= */
+
+.container > h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+.container > h1::after {
+  content: " ";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: 6px;
+  margin-bottom: 3px;
+  border-radius: 50%;
+  background: #e50914;
+}
+
+/* =========================
+   Section Headers
+   ========================= */
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 48px;
+  margin-bottom: 16px;
+}
+
+.section-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 650;
+  letter-spacing: -0.3px;
+}
+
+/* =========================
+   Links
+   ========================= */
+
+a {
+  color: #171717;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* =========================
+   Tables
+   ========================= */
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+
+  background: #ffffff;
+}
+
+th {
+  padding: 14px 16px;
+
+  background: #fafafa;
+  border-bottom: 1px solid #e5e5e5;
+
+  color: #737373;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+td {
+  padding: 16px;
+
+  border-bottom: 1px solid #eeeeee;
+
+  color: #404040;
+  font-size: 14px;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background: #fafafa;
+}
+
+/* =========================
+   Table Actions
+   ========================= */
+
+td a {
+  color: #171717;
+  font-weight: 500;
+}
+
+td button {
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: #000000;
+  font-size: 14px;
+
+  cursor: pointer;
+}
+
+td button:hover {
+  color: #ff0019;
+}
+
+/* =========================
+   Buttons
+   ========================= */
+
+button {
+  padding: 9px 15px;
+
+  border: 1px solid #171717;
+  border-radius: 8px;
+
+  background: #171717;
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+button:hover {
+  background: #ffffff;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+/* =========================
+   Add Record Page
+   ========================= */
+
+.record-selector {
+  display: flex;
+  gap: 8px;
+
+  margin-top: 32px;
+  margin-bottom: 24px;
+
+  padding-bottom: 16px;
+
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.record-selector button {
+  border: 1px solid #dedede;
+
+  background: #ffffff;
+  color: #525252;
+}
+
+.record-selector button:hover {
+  background: #f5f5f5;
+  color: #171717;
+}
+
+/* =========================
+   Forms
+   ========================= */
+
+form {
+  width: min(100%, 560px);
+  margin-top: 24px;
+  padding: 28px;
+
+  border: 1px solid #e5e5e5;
+  border-radius: 14px;
+
+  background: #ffffff;
+}
+
+label {
+  display: block;
+
+  margin-bottom: 20px;
+
+  color: #404040;
+  font-size: 14px;
+  font-weight: 550;
+}
+
+input,
+select {
+  width: 100%;
+
+  margin-top: 7px;
+  padding: 11px 12px;
+
+  border: 1px solid #d4d4d4;
+  border-radius: 8px;
+
+  outline: none;
+
+  background: #ffffff;
+  color: #171717;
+
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+input:focus,
+select:focus {
+  border-color: #171717;
+
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+}
+
+form button[type="submit"] {
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* =========================
+   Back Navigation
+   ========================= */
+
+.container > a {
+  display: inline-block;
+
+  margin-top: 10px;
+
+  color: #737373;
+  font-size: 14px;
+}
+
+.container > a:hover {
+  color: #171717;
+}
+
+/* =========================
+   Empty States
+   ========================= */
+
+td[colspan] {
+  padding: 32px;
+
+  color: #a3a3a3;
+  text-align: center;
+}
+
+.page-subtitle {
+  margin: 8px 0 0;
+
+  color: #737373;
+  font-size: 14px;
+}
+
+/* =========================
+   Responsive
+   ========================= */
+
+@media (max-width: 768px) {
+  .container {
+    width: min(100% - 28px, 1200px);
+    padding-top: 32px;
+  }
+
+  .container > h1 {
+    font-size: 28px;
+  }
+
+  .section-header {
+    margin-top: 36px;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  form {
+    padding: 22px;
+  }
+}
