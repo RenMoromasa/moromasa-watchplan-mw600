@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useState } from "react";
 
-import Dashboard from "./pages/dashboard";
+import Dashboard from "./pages/Dashboard";
 import AddRecord from "./pages/AddRecord";
 import EditRecord from "./pages/EditRecord";
 
@@ -69,26 +69,12 @@ function App() {
 
         <Route
           path="/edit/media/:id"
-          element={
-            <EditRecord
-              media={media}
-              tasks={tasks}
-              setMedia={setMedia}
-              setTasks={setTasks}
-            />
-          }
+          element={<EditRecord />}
         />
 
         <Route
           path="/edit/task/:id"
-          element={
-            <EditRecord
-              media={media}
-              tasks={tasks}
-              setMedia={setMedia}
-              setTasks={setTasks}
-            />
-          }
+          element={<EditRecord />}
         />
       </Routes>
     </BrowserRouter>
