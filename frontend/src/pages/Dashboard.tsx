@@ -1,42 +1,52 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
+import { api } from "../api";
 import type { Media, Task } from "../types";
 
 interface DashboardProps {
   media: Media[];
   tasks: Task[];
-  setMedia: React.Dispatch<React.SetStateAction<Media[]>>;
-  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+  loading: boolean;
+  error: string;
+  refresh: () => Promise<void>;
 }
 
 function Dashboard({
   media,
   tasks,
-  setMedia,
-  setTasks,
+  loading,
+  error,
+  refresh,
 }: DashboardProps) {
-  const deleteMedia = (id: number) => {
+  const [actionError, setActionError] = useState("");
+
+  const deleteMedia = async (id: number) => {
     const item = media.find((media) => media.id === id);
 
     if (!item) return;
 
+    const relatedTasks = tasks.filter((task) => task.mediaId === id).length;
     const confirmed = window.confirm(
-      `Are you sure you want to delete "${item.title}"?`
+      `Are you sure you want to delete "${item.title}"?` +
+        (relatedTasks > 0
+          ? `\n\nIts ${relatedTasks} related task(s) will also be deleted.`
+          : "")
     );
 
     if (!confirmed) return;
 
-    setMedia((currentMedia) =>
-      currentMedia.filter((media) => media.id !== id)
-    );
-
-    // Also remove tasks associated with this movie/series.
-    setTasks((currentTasks) =>
-      currentTasks.filter((task) => task.mediaId !== id)
-    );
+    try {
+      // The database also removes tasks associated with this movie/series.
+      await api.deleteMedia(id);
+      setActionError("");
+      await refresh();
+    } catch (err) {
+      setActionError((err as Error).message);
+    }
   };
 
-  const deleteTask = (id: number) => {
+  const deleteTask = async (id: number) => {
     const task = tasks.find((task) => task.id === id);
 
     if (!task) return;
@@ -47,9 +57,13 @@ function Dashboard({
 
     if (!confirmed) return;
 
-    setTasks((currentTasks) =>
-      currentTasks.filter((task) => task.id !== id)
-    );
+    try {
+      await api.deleteTask(id);
+      setActionError("");
+      await refresh();
+    } catch (err) {
+      setActionError((err as Error).message);
+    }
   };
 
   const getMediaTitle = (mediaId: number) => {
@@ -66,6 +80,10 @@ function Dashboard({
     <p className="page-subtitle">
       Keep track of what you want to watch.
     </p>
+
+    {(error || actionError) && (
+      <p className="error-message">{actionError || error}</p>
+    )}
 
       <div className="section-header">
         <h2>Movies & Series</h2>
@@ -92,7 +110,7 @@ function Dashboard({
           {media.length === 0 ? (
             <tr>
               <td colSpan={7}>
-                No movies or series found.
+                {loading ? "Loading..." : "No movies or series found."}
               </td>
             </tr>
           ) : (
@@ -152,7 +170,7 @@ function Dashboard({
           {tasks.length === 0 ? (
             <tr>
               <td colSpan={6}>
-                No tasks found.
+                {loading ? "Loading..." : "No tasks found."}
               </td>
             </tr>
           ) : (

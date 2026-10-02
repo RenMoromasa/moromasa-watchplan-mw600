@@ -1,22 +1,18 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import type { Media, Task } from "../types";
+import { api } from "../api";
+import type { Media } from "../types";
 
 interface AddRecordProps {
   media: Media[];
-  tasks: Task[];
-  setMedia: React.Dispatch<React.SetStateAction<Media[]>>;
-  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+  refresh: () => Promise<void>;
 }
 
-function AddRecord({
-  media,
-  tasks,
-  setMedia,
-  setTasks,
-}: AddRecordProps) {
+function AddRecord({ media, refresh }: AddRecordProps) {
   const navigate = useNavigate();
+  const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
 
   const [recordType, setRecordType] = useState<"media" | "task">(
     "media"
@@ -42,49 +38,36 @@ function AddRecord({
   const [taskStatus, setTaskStatus] =
     useState<"Pending" | "Completed">("Pending");
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    setSaving(true);
 
-    if (recordType === "media") {
-      const newMedia: Media = {
-        id:
-          media.length > 0
-            ? Math.max(...media.map((item) => item.id)) + 1
-            : 1,
+    try {
+      if (recordType === "media") {
+        await api.createMedia({
+          title,
+          type,
+          genre,
+          releaseYear: Number(releaseYear),
+          status,
+          rating: Number(rating),
+        });
+      } else {
+        await api.createTask({
+          mediaId: Number(mediaId),
+          taskName,
+          priority,
+          dueDate,
+          status: taskStatus,
+        });
+      }
 
-        title,
-        type,
-        genre,
-        releaseYear: Number(releaseYear),
-        status,
-        rating: Number(rating),
-      };
-
-      setMedia((currentMedia) => [
-        ...currentMedia,
-        newMedia,
-      ]);
-    } else {
-      const newTask: Task = {
-        id:
-          tasks.length > 0
-            ? Math.max(...tasks.map((item) => item.id)) + 1
-            : 1,
-
-        mediaId: Number(mediaId),
-        taskName,
-        priority,
-        dueDate,
-        status: taskStatus,
-      };
-
-      setTasks((currentTasks) => [
-        ...currentTasks,
-        newTask,
-      ]);
+      await refresh();
+      navigate("/");
+    } catch (err) {
+      setError((err as Error).message);
+      setSaving(false);
     }
-
-    navigate("/");
   };
 
   return (
@@ -108,6 +91,8 @@ function AddRecord({
           Task
         </button>
       </div>
+
+      {error && <p className="error-message">{error}</p>}
 
       <form onSubmit={handleSubmit}>
         {recordType === "media" ? (
@@ -278,8 +263,8 @@ function AddRecord({
           </>
         )}
 
-        <button type="submit">
-          Save Record
+        <button type="submit" disabled={saving}>
+          {saving ? "Saving..." : "Save Record"}
         </button>
       </form>
     </div>
