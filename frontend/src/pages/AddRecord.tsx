@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 import { api } from "../api";
 import type { Media } from "../types";
@@ -14,8 +14,9 @@ function AddRecord({ media, refresh }: AddRecordProps) {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 
+  const [searchParams] = useSearchParams();
   const [recordType, setRecordType] = useState<"media" | "task">(
-    "media"
+    searchParams.get("type") === "task" ? "task" : "media"
   );
 
   // Media fields

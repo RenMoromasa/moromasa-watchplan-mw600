@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { api } from "../api";
+import ConfirmDialog from "../components/ConfirmDialog";
 import type { Media, Task } from "../types";
 
 interface DashboardProps {
@@ -12,6 +13,12 @@ interface DashboardProps {
   refresh: () => Promise<void>;
 }
 
+interface PendingDelete {
+  kind: "media" | "task";
+  id: number;
+  message: string;
+}
+
 function Dashboard({
   media,
   tasks,
@@ -20,49 +27,58 @@ function Dashboard({
   refresh,
 }: DashboardProps) {
   const [actionError, setActionError] = useState("");
+  const [pendingDelete, setPendingDelete] =
+    useState<PendingDelete | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
-  const deleteMedia = async (id: number) => {
+  const deleteMedia = (id: number) => {
     const item = media.find((media) => media.id === id);
 
     if (!item) return;
 
     const relatedTasks = tasks.filter((task) => task.mediaId === id).length;
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${item.title}"?` +
+    setPendingDelete({
+      kind: "media",
+      id,
+      message:
+        `Are you sure you want to delete "${item.title}"?` +
         (relatedTasks > 0
-          ? `\n\nIts ${relatedTasks} related task(s) will also be deleted.`
-          : "")
-    );
-
-    if (!confirmed) return;
-
-    try {
-      // The database also removes tasks associated with this movie/series.
-      await api.deleteMedia(id);
-      setActionError("");
-      await refresh();
-    } catch (err) {
-      setActionError((err as Error).message);
-    }
+          ? ` Its ${relatedTasks} related task(s) will also be deleted.`
+          : ""),
+    });
   };
 
-  const deleteTask = async (id: number) => {
+  const deleteTask = (id: number) => {
     const task = tasks.find((task) => task.id === id);
 
     if (!task) return;
 
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${task.taskName}"?`
-    );
+    setPendingDelete({
+      kind: "task",
+      id,
+      message: `Are you sure you want to delete "${task.taskName}"?`,
+    });
+  };
 
-    if (!confirmed) return;
+  const confirmDelete = async () => {
+    if (!pendingDelete) return;
+
+    setDeleting(true);
 
     try {
-      await api.deleteTask(id);
+      // Deleting a movie/series also removes its tasks in the database.
+      if (pendingDelete.kind === "media") {
+        await api.deleteMedia(pendingDelete.id);
+      } else {
+        await api.deleteTask(pendingDelete.id);
+      }
       setActionError("");
       await refresh();
     } catch (err) {
       setActionError((err as Error).message);
+    } finally {
+      setDeleting(false);
+      setPendingDelete(null);
     }
   };
 
@@ -83,6 +99,15 @@ function Dashboard({
 
     {(error || actionError) && (
       <p className="error-message">{actionError || error}</p>
+    )}
+
+    {pendingDelete && (
+      <ConfirmDialog
+        message={pendingDelete.message}
+        busy={deleting}
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     )}
 
       <div className="section-header">
@@ -149,7 +174,7 @@ function Dashboard({
       <div className="section-header">
         <h2>Tasks</h2>
 
-        <Link to="/add">
+        <Link to="/add?type=task">
           Add Task
         </Link>
       </div>

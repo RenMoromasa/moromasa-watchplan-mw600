@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { api } from "../api";
+import ConfirmDialog from "../components/ConfirmDialog";
 import type {
   Media,
   MediaStatus,
@@ -24,6 +25,8 @@ function EditRecord({ kind, media, refresh }: EditRecordProps) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // Media fields
   const [title, setTitle] = useState("");
@@ -103,13 +106,7 @@ function EditRecord({ kind, media, refresh }: EditRecordProps) {
   };
 
   const handleDelete = async () => {
-    const name = kind === "media" ? title : taskName;
-    const extra =
-      kind === "media" ? "\n\nIts related tasks will also be deleted." : "";
-
-    if (!window.confirm(`Are you sure you want to delete "${name}"?${extra}`)) {
-      return;
-    }
+    setDeleting(true);
 
     try {
       if (kind === "media") {
@@ -122,6 +119,8 @@ function EditRecord({ kind, media, refresh }: EditRecordProps) {
       navigate("/");
     } catch (err) {
       setError((err as Error).message);
+      setDeleting(false);
+      setConfirmOpen(false);
     }
   };
 
@@ -275,12 +274,25 @@ function EditRecord({ kind, media, refresh }: EditRecordProps) {
           <button
             type="button"
             className="danger-button"
-            onClick={handleDelete}
+            onClick={() => setConfirmOpen(true)}
             disabled={saving}
           >
             Delete Record
           </button>
         </form>
+      )}
+
+      {confirmOpen && (
+        <ConfirmDialog
+          message={
+            kind === "media"
+              ? `Are you sure you want to delete "${title}"? Its related tasks will also be deleted.`
+              : `Are you sure you want to delete "${taskName}"?`
+          }
+          busy={deleting}
+          onConfirm={handleDelete}
+          onCancel={() => setConfirmOpen(false)}
+        />
       )}
     </div>
   );
